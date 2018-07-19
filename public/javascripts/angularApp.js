@@ -1,4 +1,4 @@
-var app=angular.module('flapperNews',['ui.router']);
+var app=angular.module('flapperNews',['ui.router','app.components.auth']);
 
 app.config([
 '$stateProvider',
@@ -6,13 +6,18 @@ app.config([
 function($stateProvider,$urlRouterProvider) {
 	$stateProvider.state('home',{
 		url: '/home',
-		templateUrl: '/home.html',
-		controller: 'MainCtrl'
+		templateUrl: '/templates/home.html',
+		controller: 'MainCtrl as $main'
 	});
 	$stateProvider.state('posts',{
 		url: '/posts/{id}',
-		templateUrl: '/posts.html',
+		templateUrl: '/templates/posts.html',
 		controller: 'PostsCtrl'
+	});
+	$stateProvider.state('verify',{
+		url: '/verify',
+		templateUrl: '/templates/verify.html',
+		controller: 'VerifyCtrl'
 	});
 	$urlRouterProvider.otherwise('home');
 }]);
@@ -36,8 +41,8 @@ return service;
 });
 
 app.controller('MainCtrl', [
-'$scope','postsFactory',
-function($scope,postsFactory) {
+'$scope','postsFactory','User',
+function($scope,postsFactory,User) {
 	$scope.posts = postsFactory.getPosts();
 	$scope.addPost = function() {
 		if(!$scope.title || $scope.title === '') {return;}
@@ -56,6 +61,7 @@ function($scope,postsFactory) {
 	$scope.incrementUpvotes = function(post) {
 		post.upvotes += 1;
 	};
+	this.currentUser = User.current ? User.current.email : '';
 }]);
 
 app.controller('PostsCtrl', [
@@ -76,7 +82,7 @@ function($scope,$stateParams,postsFactory) {
 	};
 }]);
 
-app.controller('SecondCtrl', [
+app.controller('VerifyCtrl', [
 '$scope','postsFactory',
 function($scope,postsFactory) {
 	$scope.posts = postsFactory.getPosts();
